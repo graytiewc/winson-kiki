@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Winson & Kiki Wedding</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@400;600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;overflow-x:hidden;background:#f5efe8}
+
+/* ══ ENVELOPE ══ */
+#env-screen{position:fixed;inset:0;z-index:100;overflow:hidden}
+#env-body{position:absolute;inset:0;background-image:url('images/envelope-body.png');background-size:cover;background-position:center;z-index:1}
+#env-flap{position:absolute;top:0;left:0;right:0;height:60%;background-image:url('images/flap.png');background-size:100% 100%;background-repeat:no-repeat;z-index:3;transition:transform 1.4s cubic-bezier(0.4,0,0.15,1);pointer-events:none}
+#env-flap.open{transform:translateY(-110%)}
+#env-seal{position:absolute;left:50%;top:51%;transform:translate(-50%,-50%);width:min(160px,42vw);z-index:5;cursor:pointer;animation:sealBounce 2s ease-in-out infinite}
+#env-seal img{width:95%;display:block;filter:drop-shadow(0 4px 16px rgba(100,60,0,0.35))}
+#env-seal:hover{animation:none;transform:translate(-50%,-50%) scale(1.08)}
+@keyframes sealBounce{0%,100%{transform:translate(-50%,-50%) scale(1)}30%{transform:translate(-50%,-54%) scale(1.06)}60%{transform:translate(-50%,-50%) scale(0.97)}80%{transform:translate(-50%,-52%) scale(1.02)}}
+#env-hint{position:absolute;top:62%;left:0;right:0;text-align:center;font-family:'Dancing Script',cursive;font-size:16px;color:#8b6030;animation:hintPulse 2s ease-in-out infinite;z-index:4;pointer-events:none;transition:opacity 0.4s}
+@keyframes hintPulse{0%,100%{opacity:0.4}50%{opacity:1}}
+#env-screen.zooming{animation:zoomPush 1s cubic-bezier(0.4,0,0.2,1) forwards;pointer-events:none}
+@keyframes zoomPush{0%{transform:scale(1);opacity:1}100%{transform:scale(9);opacity:0}}
+
+/* ══ MAIN PAGE ══ */
+#main{opacity:0;transition:opacity 1s;pointer-events:none;position:relative}
+#main.visible{opacity:1;pointer-events:all}
+.main-bg{position:relative;width:100%}
+.main-bg-img{width:100%;display:block}
+.main-overlay{position:absolute;inset:0;pointer-events:none}
+
+/* COUNTDOWN — 30%–35% from top */
+#countdown{position:absolute;top:31%;left:50%;transform:translateX(-50%);width:80%;text-align:center;pointer-events:none;z-index:10}
+.cd-row{display:flex;align-items:center;justify-content:center;gap:6px}
+.cd-cell{text-align:center;min-width:56px}
+.cd-box{background:rgba(255,252,245,0.75);backdrop-filter:blur(4px);border:1px solid rgba(212,175,95,0.5);border-radius:10px;padding:16px 12px 12px;box-shadow:0 4px 18px rgba(140,90,30,0.12)}
+.cd-n{font-family:'Cormorant Garamond',serif;font-size:56px;font-weight:400;color:#3d2010;line-height:1}
+.cd-u{font-size:16px;letter-spacing:4px;text-transform:uppercase;color:#a07848;margin-top:3px;font-family:'Jost',sans-serif}
+.cd-colon{font-family:'Cormorant Garamond',serif;font-size:22px;color:#c8a060;margin-bottom:14px;line-height:1}
+
+/* INFO SECTION — 2x2 card grid, bottom 24% */
+.info-section{
+  position:absolute;
+  bottom:6%;left:0;right:0;
+  height:12%;
+  padding:8px 10px 10px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr 1fr;
+  gap:14px;
+  pointer-events:all;
+  z-index:10;
+}
+.info-card{
+  background:rgba(255,250,242,0.88);
+  backdrop-filter:blur(6px);
+  border:1.5px solid #c8a060;
+  border-radius:12px;
+  padding:6px 8px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  text-align:center;
+}
+.info-card-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;font-weight:400;font-style:italic;
+  color:#3d2010;line-height:1.2;
+}
+.info-card-val{
+  font-family:'Jost',sans-serif;
+  font-size:20px;font-weight:500;
+  color:#8b5e18;line-height:1.35;
+}
+.info-btn{
+  display:block;cursor:pointer;pointer-events:all;
+  border:none;background:none;padding:0;
+  transition:transform 0.15s,opacity 0.15s;
+  width:92%;
+}
+.info-btn:hover{transform:scale(1.04);opacity:0.9}
+.info-btn:active{transform:scale(0.97)}
+.info-btn img{
+  width:100%;height:auto;max-height:52px;
+  object-fit:contain;display:block;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+/* DOWNLOAD — fixed bottom-right */
+#download-btn{position:fixed;bottom:30px;right:16px;z-index:200;cursor:pointer;pointer-events:all;border:none;background:none;padding:0;display:none;transition:transform 0.15s,opacity 0.15s;filter:drop-shadow(0 3px 10px rgba(0,0,0,0.2))}
+#download-btn:hover{transform:scale(1.05);opacity:0.92}
+#download-btn img{height:44px;width:auto;display:block}
+
+/* ══ RSVP ══ */
+.rsvp-section{background:#faf5ee;padding:28px 20px 36px;border-top:1px solid #e0ccb0}
+.rsvp-title{font-family:'Dancing Script',cursive;font-size:30px;font-weight:700;color:#3d2010;text-align:center;margin-bottom:4px}
+.rsvp-sub{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#a07848;text-align:center;margin-bottom:20px;font-family:'Jost',sans-serif}
+.rsvp-card{background:#fff;border:1px solid #e0ccb0;border-radius:16px;padding:22px 18px}
+.rsvp-intro{font-size:12px;color:#8a6040;line-height:1.8;text-align:center;margin-bottom:20px;font-family:'Jost',sans-serif}
+.inp-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#a07848;font-weight:500;margin-bottom:6px;display:block;font-family:'Jost',sans-serif}
+.inp-grp{margin-bottom:14px}
+input.inp,textarea.inp{width:100%;padding:11px 13px;border:1px solid #e0ccb0;border-radius:9px;font-family:'Jost',sans-serif;font-size:12px;font-weight:300;color:#3d2010;background:#faf6f0;outline:none;transition:border-color 0.2s}
+input.inp:focus,textarea.inp:focus{border-color:#c8a060}
+textarea.inp{resize:vertical;min-height:72px}
+.att-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+.att-btn{padding:11px;border:1.5px solid #e0ccb0;border-radius:9px;font-family:'Jost',sans-serif;font-size:11px;cursor:pointer;background:#faf6f0;color:#8a6040;transition:all 0.2s;letter-spacing:1px}
+.att-btn.active{background:#3d2010;border-color:#3d2010;color:#f0d8a0}
+.sub-btn{width:100%;padding:13px;background:#3d2010;color:#f0d8a0;border:none;border-radius:11px;font-family:'Jost',sans-serif;font-size:10px;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s}
+.sub-btn:hover{opacity:0.85}
+.ok-box{display:none;text-align:center;padding:16px 8px}
+.ok-icon{font-size:36px;margin-bottom:12px}
+.ok-title{font-family:'Dancing Script',cursive;font-size:26px;color:#8b5e2a;margin-bottom:6px}
+.ok-text{font-size:12px;color:#8a6040;line-height:1.8;font-family:'Jost',sans-serif}
+.footer{text-align:center;padding:20px 20px 28px;font-size:10px;color:#c8a870;letter-spacing:1.5px;border-top:1px solid #e0ccb0;background:#faf5ee;font-family:'Jost',sans-serif}
+</style>
+</head>
+<body>
+
+<!-- ENVELOPE -->
+<div id="env-screen">
+  <div id="env-body"></div>
+  <div id="env-flap"></div>
+  <div id="env-seal" onclick="openEnvelope()">
+    <img src="images/seal.png" alt="Winson & Kiki">
+  </div>
+  <div id="env-hint">tap to open ✦</div>
+</div>
+
+<!-- MAIN PAGE -->
+<div id="main">
+  <div class="main-bg">
+    <img class="main-bg-img" src="images/main.png" alt="Winson & Kiki Wedding">
+    <div class="main-overlay">
+
+      <!-- COUNTDOWN -->
+      <div id="countdown">
+        <div class="cd-row">
+          <div class="cd-cell"><div class="cd-box"><div class="cd-n" id="cd-d">--</div></div><div class="cd-u">Days</div></div>
+          <div class="cd-colon">:</div>
+          <div class="cd-cell"><div class="cd-box"><div class="cd-n" id="cd-h">--</div></div><div class="cd-u">Hours</div></div>
+          <div class="cd-colon">:</div>
+          <div class="cd-cell"><div class="cd-box"><div class="cd-n" id="cd-m">--</div></div><div class="cd-u">Mins</div></div>
+        </div>
+      </div>
+
+      <!-- 2x2 INFO CARDS -->
+      <div class="info-section">
+
+        <!-- Location -->
+        <div class="info-card">
+          <div class="info-card-title">Location</div>
+          <div class="info-card-val">Season Hotel<br>Hall 2</div>
+          <button class="info-btn" onclick="void(0)">
+            <img src="images/Location_bt.png" alt="Bring me there">
+          </button>
+        </div>
+
+        <!-- Time & Date -->
+        <div class="info-card">
+          <div class="info-card-title">Time &amp; Date</div>
+          <div class="info-card-val">23.05.2026<br>6:00 PM · Saturday</div>
+        </div>
+
+        <!-- Winson -->
+        <div class="info-card">
+          <div class="info-card-title">Winson</div>
+          <button class="info-btn" onclick="void(0)">
+            <img src="images/cantact_bt.png" alt="Contact Winson">
+          </button>
+        </div>
+
+        <!-- Kiki -->
+        <div class="info-card">
+          <div class="info-card-title">Kiki</div>
+          <button class="info-btn" onclick="void(0)">
+            <img src="images/cantact_bt.png" alt="Contact Kiki">
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- RSVP -->
+  <div class="rsvp-section">
+    <div class="rsvp-title">出席签到</div>
+    <div class="rsvp-sub">RSVP</div>
+    <div class="rsvp-card">
+      <div class="rsvp-intro">请回覆您的出席情况，<br>让我们为您做好最好的安排 💐</div>
+      <div id="rsvp-form">
+        <div class="inp-grp"><label class="inp-lbl">您的名字 Name</label><input class="inp" id="g-name" placeholder="请输入您的名字"></div>
+        <div class="inp-grp"><label class="inp-lbl">祝福语 Wishes</label><textarea class="inp" id="g-wish" placeholder="留下您对 Winson & Kiki 的祝福..."></textarea></div>
+        <div class="inp-grp">
+          <label class="inp-lbl">出席情况 Attendance</label>
+          <div class="att-grid">
+            <button class="att-btn active" id="btn-yes" onclick="setAtt('yes')">✓ 出席</button>
+            <button class="att-btn" id="btn-no" onclick="setAtt('no')">✗ 未能出席</button>
+          </div>
+        </div>
+        <button class="sub-btn" onclick="submitR()">确认回覆 Confirm</button>
+      </div>
+      <div class="ok-box" id="rsvp-ok">
+        <div class="ok-icon">🌸</div>
+        <div class="ok-title">Thank You!</div>
+        <div class="ok-text">我们已收到您的回覆。<br>期待与您共度这美好的一天！</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Winson &amp; Kiki · 23.05.2026<br>
+    <span style="font-size:10px;display:block;margin-top:3px;opacity:0.7">With love &amp; gratitude</span>
+  </div>
+</div>
+
+<!-- DOWNLOAD fixed bottom-right -->
+<button id="download-btn" onclick="void(0)">
+  <img src="images/download_bt.png" alt="Download Photos">
+</button>
+
+<script>
+var att='yes', opened=false;
+
+function openEnvelope(){
+  if(opened)return;
+  opened=true;
+  document.getElementById('env-hint').style.opacity='0';
+  document.getElementById('env-flap').classList.add('open');
+  setTimeout(function(){document.getElementById('env-screen').classList.add('zooming');},1400);
+  setTimeout(function(){
+    document.getElementById('env-screen').style.display='none';
+    document.getElementById('main').classList.add('visible');
+    document.getElementById('download-btn').style.display='block';
+    updateCD();
+    setInterval(updateCD,60000);
+  },2300);
+}
+
+function setAtt(v){
+  att=v;
+  document.getElementById('btn-yes').classList.toggle('active',v==='yes');
+  document.getElementById('btn-no').classList.toggle('active',v==='no');
+}
+
+function submitR(){
+  var name=document.getElementById('g-name').value.trim();
+  if(!name){document.getElementById('g-name').style.borderColor='#c8a060';document.getElementById('g-name').focus();return;}
+  document.getElementById('rsvp-form').style.display='none';
+  document.getElementById('rsvp-ok').style.display='block';
+}
+
+function updateCD(){
+  var diff=new Date('2026-05-23T18:00:00+08:00')-new Date();
+  if(diff<=0){['cd-d','cd-h','cd-m'].forEach(function(id){document.getElementById(id).textContent='0';});return;}
+  document.getElementById('cd-d').textContent=Math.floor(diff/86400000);
+  document.getElementById('cd-h').textContent=Math.floor((diff%86400000)/3600000);
+  document.getElementById('cd-m').textContent=Math.floor((diff%3600000)/60000);
+}
+</script>
+</body>
+</html>
