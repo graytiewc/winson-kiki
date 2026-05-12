@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Winson & Kiki Wedding</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Dancing+Script:wght@400;600;700&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;min-height:100%;overflow-x:hidden;background:#f5efe8}
+body{font-family:'Jost',sans-serif}
+
+/* ══ ENVELOPE ══ */
+#env-screen{position:fixed;inset:0;z-index:100;overflow:hidden}
+#env-body{position:absolute;inset:0;background-image:url('images/envelope-body.png');background-size:cover;background-position:center;z-index:1}
+#env-flap{position:absolute;top:0;left:0;right:0;height:60%;background-image:url('images/flap.png');background-size:100% 100%;background-repeat:no-repeat;z-index:3;transition:transform 1.4s cubic-bezier(0.4,0,0.15,1);pointer-events:none}
+#env-flap.open{transform:translateY(-110%)}
+#env-seal{position:absolute;left:50%;top:51%;transform:translate(-50%,-50%);width:min(144px,37.8vw);z-index:5;cursor:pointer;animation:sealBounce 2s ease-in-out infinite}
+#env-seal img{width:95%;display:block;filter:drop-shadow(0 4px 16px rgba(100,60,0,0.35))}
+#env-seal:hover{animation:none;transform:translate(-50%,-50%) scale(1.08)}
+@keyframes sealBounce{0%,100%{transform:translate(-50%,-50%) scale(1)}30%{transform:translate(-50%,-54%) scale(1.06)}60%{transform:translate(-50%,-50%) scale(0.97)}80%{transform:translate(-50%,-52%) scale(1.02)}}
+#env-hint{position:absolute;top:62%;left:0;right:0;text-align:center;font-family:'Dancing Script',cursive;font-size:16px;color:#8b6030;animation:hintPulse 2s ease-in-out infinite;z-index:4;pointer-events:none;transition:opacity 0.4s}
+@keyframes hintPulse{0%,100%{opacity:0.4}50%{opacity:1}}
+#env-screen.zooming{animation:zoomPush 1s cubic-bezier(0.4,0,0.2,1) forwards;pointer-events:none}
+@keyframes zoomPush{0%{transform:scale(1);opacity:1}100%{transform:scale(9);opacity:0}}
+
+/* ══ MAIN PAGE ══ */
+#main{opacity:0;transition:opacity 1s;pointer-events:none;position:relative;max-width:480px;margin:0 auto;background:#faf5ee;box-shadow:0 18px 55px rgba(75,45,15,0.16)}
+#main.visible{opacity:1;pointer-events:all}
+.main-bg{position:relative;width:100%}
+.main-bg-img{width:100%;display:block}
+.main-overlay{position:absolute;inset:0;pointer-events:none}
+
+#petal-layer{position:fixed;inset:0;z-index:150;pointer-events:none;overflow:hidden;display:none}
+.petal{
+  position:absolute;
+  left:var(--start-x);
+  top:-12vh;
+  width:var(--size);
+  height:calc(var(--size) * 1.45);
+  opacity:0;
+  border-radius:72% 18% 68% 28%;
+  background:
+    radial-gradient(circle at 35% 24%,rgba(255,255,255,0.78) 0 10%,transparent 11%),
+    radial-gradient(circle at 68% 80%,rgba(198,86,124,0.22) 0 18%,transparent 19%),
+    linear-gradient(145deg,var(--petal-a),var(--petal-b) 58%,var(--petal-c));
+  box-shadow:inset -2px -4px 8px rgba(151,59,92,0.12),0 3px 10px rgba(117,67,78,0.12);
+  transform:translate3d(0,0,0) rotate(var(--tilt));
+  animation:petalFall var(--dur) linear forwards;
+}
+.petal::after{
+  content:"";
+  position:absolute;
+  left:52%;
+  top:10%;
+  width:1px;
+  height:78%;
+  background:linear-gradient(to bottom,rgba(174,72,107,0),rgba(174,72,107,0.28),rgba(174,72,107,0));
+  transform:rotate(10deg);
+}
+@keyframes petalFall{
+  0%{opacity:0;transform:translate3d(0,-8vh,0) rotate(var(--tilt)) scale(0.86)}
+  8%{opacity:0.88}
+  30%{transform:translate3d(calc(var(--sway) * 0.45),28vh,0) rotate(calc(var(--tilt) + 105deg)) scale(1)}
+  62%{transform:translate3d(calc(var(--sway) * -0.32),68vh,0) rotate(calc(var(--tilt) + 230deg)) scale(0.96)}
+  88%{opacity:0.82}
+  100%{opacity:0;transform:translate3d(var(--end-x),112vh,0) rotate(calc(var(--tilt) + 390deg)) scale(0.9)}
+}
+
+/* COUNTDOWN — 30%–35% from top */
+#countdown{position:absolute;top:31%;left:50%;transform:translateX(-50%);width:80%;text-align:center;pointer-events:none;z-index:10}
+.cd-row{display:flex;align-items:center;justify-content:center;gap:5.4px}
+.cd-cell{text-align:center;min-width:50.4px}
+.cd-box{background:rgba(255,252,245,0.75);backdrop-filter:blur(4px);border:1px solid rgba(212,175,95,0.5);border-radius:9px;padding:14.4px 10.8px 10.8px;box-shadow:0 4px 18px rgba(140,90,30,0.12)}
+.cd-n{font-family:'Cormorant Garamond',serif;font-size:50.4px;font-weight:400;color:#3d2010;line-height:1}
+.cd-u{font-size:14.4px;letter-spacing:3.6px;text-transform:uppercase;color:#a07848;margin-top:2.7px;font-family:'Jost',sans-serif}
+.cd-colon{font-family:'Cormorant Garamond',serif;font-size:19.8px;color:#c8a060;margin-bottom:12.6px;line-height:1}
+
+/* INFO SECTION — 2x2 card grid, bottom 24% */
+.info-section{
+  position:absolute;
+  bottom:6%;left:0;right:0;
+  height:12%;
+  padding:8px 10px 10px;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:1fr 1fr;
+  gap:14px;
+  pointer-events:all;
+  z-index:10;
+}
+.info-card{
+  background:rgba(255,250,242,0.88);
+  backdrop-filter:blur(6px);
+  border:1.5px solid #c8a060;
+  border-radius:12px;
+  padding:6px 8px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  text-align:center;
+}
+.info-card-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:20px;font-weight:400;font-style:italic;
+  color:#3d2010;line-height:1.2;
+}
+.info-card-val{
+  font-family:'Jost',sans-serif;
+  font-size:20px;font-weight:500;
+  color:#8b5e18;line-height:1.35;
+}
+.info-btn{
+  display:block;cursor:pointer;pointer-events:all;
+  border:none;background:none;padding:0;
+  transition:transform 0.15s,opacity 0.15s;
+  width:92%;
+}
+.info-btn:hover{transform:scale(1.04);opacity:0.9}
+.info-btn:active{transform:scale(0.97)}
+.info-btn img{
+  width:100%;height:auto;max-height:52px;
+  object-fit:contain;display:block;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+/* DOWNLOAD — fixed bottom-right */
+#download-btn{position:fixed;bottom:30px;right:max(16px,calc((100vw - 480px)/2 + 16px));z-index:200;cursor:pointer;pointer-events:all;border:none;background:none;padding:0;display:none;transition:transform 0.15s,opacity 0.15s;filter:drop-shadow(0 3px 10px rgba(0,0,0,0.2))}
+#download-btn:hover{transform:scale(1.05);opacity:0.92}
+#download-btn img{height:44px;width:auto;display:block}
+
+#music-btn{position:fixed;bottom:86px;right:max(16px,calc((100vw - 480px)/2 + 16px));z-index:200;display:none;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid rgba(200,160,96,0.75);border-radius:50%;background:rgba(255,250,242,0.92);color:#8b5e18;font-family:'Jost',sans-serif;font-size:11px;font-weight:500;letter-spacing:1px;cursor:pointer;pointer-events:all;box-shadow:0 3px 10px rgba(0,0,0,0.14);transition:transform 0.15s,opacity 0.15s}
+#music-btn:hover{transform:scale(1.05);opacity:0.92}
+#music-btn.is-muted{color:#b8a58d;border-color:rgba(184,165,141,0.75)}
+
+/* ══ RSVP ══ */
+.rsvp-section{background:#faf5ee;padding:28px 20px 36px;border-top:1px solid #e0ccb0}
+.rsvp-title{font-family:'Dancing Script',cursive;font-size:30px;font-weight:700;color:#3d2010;text-align:center;margin-bottom:4px}
+.rsvp-sub{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#a07848;text-align:center;margin-bottom:20px;font-family:'Jost',sans-serif}
+.rsvp-card{background:#fff;border:1px solid #e0ccb0;border-radius:16px;padding:22px 18px}
+.rsvp-intro{font-size:12px;color:#8a6040;line-height:1.8;text-align:center;margin-bottom:20px;font-family:'Jost',sans-serif}
+.inp-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#a07848;font-weight:500;margin-bottom:6px;display:block;font-family:'Jost',sans-serif}
+.inp-grp{margin-bottom:14px}
+input.inp,textarea.inp{width:100%;padding:11px 13px;border:1px solid #e0ccb0;border-radius:9px;font-family:'Jost',sans-serif;font-size:12px;font-weight:300;color:#3d2010;background:#faf6f0;outline:none;transition:border-color 0.2s}
+input.inp:focus,textarea.inp:focus{border-color:#c8a060}
+textarea.inp{resize:vertical;min-height:72px}
+.sub-btn{width:100%;padding:13px;background:#3d2010;color:#f0d8a0;border:none;border-radius:11px;font-family:'Jost',sans-serif;font-size:10px;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;transition:opacity 0.2s}
+.sub-btn:hover{opacity:0.85}
+.ok-box{display:none;text-align:center;padding:16px 8px}
+.ok-icon{font-size:36px;margin-bottom:12px}
+.ok-title{font-family:'Dancing Script',cursive;font-size:26px;color:#8b5e2a;margin-bottom:6px}
+.ok-text{font-size:12px;color:#8a6040;line-height:1.8;font-family:'Jost',sans-serif}
+.wishes-panel{margin-top:16px;border-top:1px solid #ead8bd;padding-top:16px}
+.wish-toggle{width:100%;padding:11px;border:1px solid #c8a060;border-radius:10px;background:#fffaf2;color:#8b5e18;font-family:'Jost',sans-serif;font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:background 0.2s,opacity 0.2s}
+.wish-toggle:hover{background:#faf6f0;opacity:0.9}
+.wish-list{display:none;margin-top:12px;max-height:280px;overflow:auto;border:1px solid #ead8bd;border-radius:12px;background:#fffaf8}
+.wish-list.open{display:block}
+.wish-table{width:100%;border-collapse:collapse;font-family:'Jost',sans-serif}
+.wish-table th,.wish-table td{padding:10px 8px;border-bottom:1px solid #f0e3d1;text-align:left;vertical-align:top;font-size:11px;color:#6e4a32;line-height:1.55}
+.wish-table th{font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:#a07848;background:#faf1e6;font-weight:500}
+.wish-table tr:last-child td{border-bottom:none}
+.wish-name{width:34%;font-weight:500;color:#3d2010}
+.wish-empty{padding:18px 12px;text-align:center;font-size:12px;color:#a07848;font-family:'Jost',sans-serif}
+.footer{text-align:center;padding:20px 20px 28px;font-size:10px;color:#c8a870;letter-spacing:1.5px;border-top:1px solid #e0ccb0;background:#faf5ee;font-family:'Jost',sans-serif}
+
+@media (min-width:481px){
+  body{
+    padding:24px 0;
+    background:
+      radial-gradient(circle at top left,rgba(200,160,96,0.20),transparent 32%),
+      linear-gradient(135deg,#fbf5ec 0%,#eadac5 100%);
+  }
+  #main{border-radius:18px;overflow:hidden}
+  #env-screen{width:100%;max-width:480px;left:50%;right:auto;transform:translateX(-50%);box-shadow:0 18px 55px rgba(75,45,15,0.16)}
+  #env-screen.zooming{animation:desktopZoomPush 1s cubic-bezier(0.4,0,0.2,1) forwards;pointer-events:none}
+  @keyframes desktopZoomPush{0%{transform:translateX(-50%) scale(1);opacity:1}100%{transform:translateX(-50%) scale(9);opacity:0}}
+}
+
+@media (max-width:480px){
+  #main{max-width:none;box-shadow:none}
+  #countdown{transform:translateX(-50%) scale(0.8);transform-origin:top center}
+}
+</style>
+</head>
+<body>
+
+<!-- ENVELOPE -->
+<div id="env-screen">
+  <div id="env-body"></div>
+  <div id="env-flap"></div>
+  <div id="env-seal" onclick="openEnvelope()">
+    <img src="images/seal.png" alt="Winson & Kiki">
+  </div>
+  <div id="env-hint">tap to open ✦</div>
+</div>
+
+<!-- MAIN PAGE -->
+<div id="main">
+  <div class="main-bg">
+    <img class="main-bg-img" src="images/main.png" alt="Winson & Kiki Wedding">
+    <div class="main-overlay">
+
+      <!-- COUNTDOWN -->
+      <div id="countdown">
+        <div class="cd-row">
+          <div class="cd-cell"><div class="cd-box"><div class="cd-n" id="cd-d">--</div></div><div class="cd-u">Days</div></div>
+          <div class="cd-colon">:</div>
+          <div class="cd-cell"><div class="cd-box"><div class="cd-n" id="cd-h">--</div></div><div class="cd-u">Hours</div></div>
+          <div class="cd-colon">:</div>
+          <div class="cd-cell"><div class="cd-box"><div class="cd-n" id="cd-m">--</div></div><div class="cd-u">Mins</div></div>
+        </div>
+      </div>
+
+      <!-- 2x2 INFO CARDS -->
+      <div class="info-section">
+
+        <!-- Location -->
+        <div class="info-card">
+          <div class="info-card-title">Location</div>
+          <div class="info-card-val">Season Hotel<br>Hall 2</div>
+          <button class="info-btn" onclick="void(0)">
+            <img src="images/Location_bt.png" alt="Bring me there">
+          </button>
+        </div>
+
+        <!-- Time & Date -->
+        <div class="info-card">
+          <div class="info-card-title">Time &amp; Date</div>
+          <div class="info-card-val">23.05.2026<br>6:00 PM · Saturday</div>
+        </div>
+
+        <!-- Winson -->
+        <div class="info-card">
+          <div class="info-card-title">Winson</div>
+          <button class="info-btn" onclick="void(0)">
+            <img src="images/cantact_bt.png" alt="Contact Winson">
+          </button>
+        </div>
+
+        <!-- Kiki -->
+        <div class="info-card">
+          <div class="info-card-title">Kiki</div>
+          <button class="info-btn" onclick="void(0)">
+            <img src="images/cantact_bt.png" alt="Contact Kiki">
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- RSVP -->
+  <div class="rsvp-section">
+    <div class="rsvp-title">Send your best wishes</div>
+    <div class="rsvp-card">
+      <div class="rsvp-intro">Leave your name and wishes<br>for Winson &amp; Kiki</div>
+      <div id="rsvp-form">
+        <div class="inp-grp"><label class="inp-lbl">Name</label><input class="inp" id="g-name" placeholder="Your name"></div>
+        <div class="inp-grp"><label class="inp-lbl">Wishes</label><textarea class="inp" id="g-wish" placeholder="Write your wishes for Winson &amp; Kiki..."></textarea></div>
+        <button class="sub-btn" onclick="submitR()">Send</button>
+      </div>
+      <div class="ok-box" id="rsvp-ok">
+        <div class="ok-icon">♡</div>
+        <div class="ok-title">Thank You!</div>
+        <div class="ok-text">Your wishes have been sent.<br>Thank you for your love.</div>
+      </div>
+      <div class="wishes-panel">
+        <button class="wish-toggle" id="wish-toggle" onclick="toggleWishList()">View Wishes</button>
+        <div class="wish-list" id="wish-list">
+          <table class="wish-table">
+            <thead>
+              <tr><th>Name</th><th>Wishes</th></tr>
+            </thead>
+            <tbody id="wish-body"></tbody>
+          </table>
+          <div class="wish-empty" id="wish-empty">No wishes yet</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Winson &amp; Kiki · 23.05.2026<br>
+    <span style="font-size:10px;display:block;margin-top:3px;opacity:0.7">With love &amp; gratitude</span>
+  </div>
+</div>
+
+<!-- DOWNLOAD fixed bottom-right -->
+<button id="download-btn" onclick="void(0)">
+  <img src="images/download_bt.png" alt="Download Photos">
+</button>
+
+<button id="music-btn" onclick="toggleBgm()" aria-label="Toggle music">BGM</button>
+<audio id="bgm" src="music.mp3" preload="auto" loop></audio>
+<audio id="click-sfx" src="click.mp3" preload="auto"></audio>
+<div id="petal-layer" aria-hidden="true"></div>
+
+<script>
+var opened=false, bgmReady=false, petalTimer=null;
+var WISH_API='https://script.google.com/macros/s/AKfycby76n11j_ZO9lzkzp5ll0abHFzmf6jKthNVXY31IG19GD0He5AxI4jBKSYJg3mbY6vD/exec';
+
+document.addEventListener('click',function(e){
+  if(e.target.closest('button,#env-seal')){
+    playClickSfx();
+  }
+});
+
+function playClickSfx(){
+  var sfx=document.getElementById('click-sfx');
+  if(!sfx)return;
+  sfx.currentTime=0;
+  sfx.volume=0.65;
+  var promise=sfx.play();
+  if(promise&&promise.catch){
+    promise.catch(function(){});
+  }
+}
+
+function openEnvelope(){
+  if(opened)return;
+  opened=true;
+  playBgm();
+  document.getElementById('env-hint').style.opacity='0';
+  document.getElementById('env-flap').classList.add('open');
+  setTimeout(function(){document.getElementById('env-screen').classList.add('zooming');},1400);
+  setTimeout(function(){
+    document.getElementById('env-screen').style.display='none';
+    document.getElementById('main').classList.add('visible');
+    document.getElementById('download-btn').style.display='block';
+    document.getElementById('music-btn').style.display='flex';
+    startPetals();
+    renderWishes();
+    updateCD();
+    setInterval(updateCD,60000);
+  },2300);
+}
+
+function startPetals(){
+  var layer=document.getElementById('petal-layer');
+  if(!layer||petalTimer)return;
+  layer.style.display='block';
+  for(var i=0;i<14;i++){
+    setTimeout(spawnPetal,i*260);
+  }
+  petalTimer=setInterval(spawnPetal,620);
+}
+
+function spawnPetal(){
+  var layer=document.getElementById('petal-layer');
+  if(!layer)return;
+  var p=document.createElement('div');
+  var palette=[
+    ['#ffe0ea','#f4a9c4','#d9789f'],
+    ['#ffd5e2','#f1bfd1','#c96691'],
+    ['#fff0f4','#f6b5ca','#de86aa'],
+    ['#f8c7d6','#e995b4','#bd5f86']
+  ];
+  var colors=palette[Math.floor(Math.random()*palette.length)];
+  var startX=-4+Math.random()*108;
+  var endX=(-16+Math.random()*32)+'vw';
+  var sway=(-24+Math.random()*48)+'vw';
+  var size=10+Math.random()*18;
+  var dur=7+Math.random()*7;
+
+  p.className='petal';
+  p.style.setProperty('--start-x',startX+'vw');
+  p.style.setProperty('--end-x',endX);
+  p.style.setProperty('--sway',sway);
+  p.style.setProperty('--size',size+'px');
+  p.style.setProperty('--dur',dur+'s');
+  p.style.setProperty('--tilt',(-80+Math.random()*160)+'deg');
+  p.style.setProperty('--petal-a',colors[0]);
+  p.style.setProperty('--petal-b',colors[1]);
+  p.style.setProperty('--petal-c',colors[2]);
+  layer.appendChild(p);
+  setTimeout(function(){p.remove();},dur*1000+300);
+}
+
+function playBgm(){
+  var bgm=document.getElementById('bgm');
+  var btn=document.getElementById('music-btn');
+  if(!bgm)return;
+  bgm.volume=0.55;
+  var promise=bgm.play();
+  if(promise&&promise.then){
+    promise.then(function(){
+      bgmReady=true;
+      if(btn)btn.classList.remove('is-muted');
+    }).catch(function(){
+      bgmReady=false;
+      if(btn)btn.classList.add('is-muted');
+    });
+  }else{
+    bgmReady=true;
+  }
+}
+
+function toggleBgm(){
+  var bgm=document.getElementById('bgm');
+  var btn=document.getElementById('music-btn');
+  if(!bgm)return;
+  if(bgm.paused){
+    playBgm();
+  }else{
+    bgm.pause();
+    bgmReady=false;
+    if(btn)btn.classList.add('is-muted');
+  }
+}
+
+function showWishError(){
+  var list=document.getElementById('wish-list');
+  var empty=document.getElementById('wish-empty');
+  if(list)list.classList.add('open');
+  if(empty){
+    empty.style.display='block';
+    empty.textContent='Unable to connect. Please try again later.';
+  }
+}
+
+function resetWishEmpty(){
+  var empty=document.getElementById('wish-empty');
+  if(empty)empty.textContent='No wishes yet';
+}
+
+function setWishLoading(){
+  var empty=document.getElementById('wish-empty');
+  if(empty){
+    empty.style.display='block';
+    empty.textContent='Loading wishes...';
+  }
+}
+
+function submitR(){
+  var name=document.getElementById('g-name').value.trim();
+  var wish=document.getElementById('g-wish').value.trim();
+  if(!name){document.getElementById('g-name').style.borderColor='#c8a060';document.getElementById('g-name').focus();return;}
+  if(!wish){document.getElementById('g-wish').style.borderColor='#c8a060';document.getElementById('g-wish').focus();return;}
+  jsonpRequest({action:'add',name:name,wish:wish},function(data){
+    if(!data||!data.ok){
+      showWishError();
+      return;
+    }
+    renderWishes();
+    document.getElementById('rsvp-form').style.display='none';
+    document.getElementById('rsvp-ok').style.display='block';
+  },showWishError);
+}
+
+function renderWishes(){
+  var body=document.getElementById('wish-body');
+  var empty=document.getElementById('wish-empty');
+  if(!body||!empty)return;
+  setWishLoading();
+  jsonpRequest({action:'list'},function(data){
+    var wishes=(data&&data.wishes)||[];
+    resetWishEmpty();
+    body.innerHTML='';
+    wishes.forEach(function(item){
+      var row=document.createElement('tr');
+      var nameCell=document.createElement('td');
+      var wishCell=document.createElement('td');
+      nameCell.className='wish-name';
+      nameCell.textContent=item.name||'';
+      wishCell.textContent=item.wish||'';
+      row.appendChild(nameCell);
+      row.appendChild(wishCell);
+      body.appendChild(row);
+    });
+    empty.style.display=wishes.length?'none':'block';
+  },showWishError);
+}
+
+function toggleWishList(){
+  var list=document.getElementById('wish-list');
+  var btn=document.getElementById('wish-toggle');
+  if(!list||!btn)return;
+  var isOpen=list.classList.toggle('open');
+  btn.textContent=isOpen?'Hide Wishes':'View Wishes';
+  if(isOpen)renderWishes();
+}
+
+function jsonpRequest(params,callback,errorCallback){
+  var cbName='wishCallback'+Date.now()+Math.floor(Math.random()*1000);
+  var script=document.createElement('script');
+  var done=false;
+  var timer=setTimeout(function(){
+    finish();
+    if(errorCallback)errorCallback();
+  },10000);
+  function finish(){
+    if(done)return;
+    done=true;
+    clearTimeout(timer);
+    delete window[cbName];
+    script.remove();
+  }
+  params.callback=cbName;
+  var query=Object.keys(params).map(function(key){
+    return encodeURIComponent(key)+'='+encodeURIComponent(params[key]);
+  }).join('&');
+  window[cbName]=function(data){
+    finish();
+    callback(data);
+  };
+  script.onerror=function(){
+    finish();
+    if(errorCallback)errorCallback();
+  };
+  script.src=WISH_API+'?'+query;
+  document.body.appendChild(script);
+}
+
+function updateCD(){
+  var diff=new Date('2026-05-23T18:00:00+08:00')-new Date();
+  if(diff<=0){['cd-d','cd-h','cd-m'].forEach(function(id){document.getElementById(id).textContent='0';});return;}
+  document.getElementById('cd-d').textContent=Math.floor(diff/86400000);
+  document.getElementById('cd-h').textContent=Math.floor((diff%86400000)/3600000);
+  document.getElementById('cd-m').textContent=Math.floor((diff%3600000)/60000);
+}
+</script>
+</body>
+</html>
